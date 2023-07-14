@@ -38,6 +38,7 @@ class Manager(models.Model):
 class Amenity(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    image = models.ImageField(upload_to='room_images/')
     # Add other fields as per your requirements
 
     def __str__(self):
@@ -69,6 +70,14 @@ class Room(models.Model):
 
     def __str__(self):
         return self.room_number
+
+
+class RoomImage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    image1 = models.ImageField(upload_to='room_images/')
+    image2 = models.ImageField(upload_to='room_images/')
+    image3 = models.ImageField(upload_to='room_images/')
+
 
 class Payment(models.Model):
     booking = models.OneToOneField('Booking', on_delete=models.CASCADE)
