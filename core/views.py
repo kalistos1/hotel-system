@@ -38,13 +38,6 @@ def rooms(request):
                }
     return render(request, 'pages/accomodation.html',context)
 
-def BookRoom(request):
-    rooms = Room.objects.all()
-    context = {
-                'rooms':rooms,
-               }
-    return render(request, 'pages/accomodation.html',context)
-
 
 
 @login_required
@@ -62,21 +55,35 @@ def room_book(request, room_id):
             guests = form.cleaned_data['guests']
             payment_option = form.cleaned_data['payment_option']
 
-            booking = Booking.objects.create(
-                room=room,
-                customer=request.user.customer,
-                check_in_date=check_in_date,
-                check_out_date=check_out_date,
-                guests=guests,
-                payment_option=payment_option
-            )
-
             if payment_option == 'card':
+                booking = Booking.objects.create(
+                    room=room,
+                    customer=request.user.customer,
+                    check_in_date=check_in_date,
+                    check_out_date=check_out_date,
+                    guests=guests,
+                    payment_option=payment_option
+                )
                 return initiate_payment(request, booking)
+
             elif payment_option == 'cash':
-                booking.is_paid = True
-                booking.save()
-                return redirect('booking_success', booking_id=booking.id)
+                room_type = room.room_type
+
+                # Check if any other rooms of the same type are available
+                if room_type.available_rooms > 0:
+                    booking = Booking.objects.create(
+                        room=room,
+                        customer=request.user.customer,
+                        check_in_date=check_in_date,
+                        check_out_date=check_out_date,
+                        guests=guests,
+                        payment_option=payment_option
+                    )
+                    booking.is_paid = True
+                    booking.save()
+                    return redirect('booking_success', booking_id=booking.id)
+                else:
+                    return render(request, 'room_not_available.html', {'room': room})
 
     else:
         form = BookingForm()
@@ -95,7 +102,6 @@ def initiate_payment(request, booking):
         booking=booking,
         amount=total_amount,
         payment_method='card',
-        transaction_id='',
         transaction_ref=transaction_ref,
         email=booking.customer.user.email
     )

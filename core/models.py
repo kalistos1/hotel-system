@@ -1,7 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from decimal import Decimal
+from datetime import timedelta
 import uuid
+
+
 class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
     is_receptionist = models.BooleanField(default=False)
@@ -44,7 +47,7 @@ class Amenity(models.Model):
 
     def __str__(self):
         return self.name
-
+    
 class RoomType(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -96,8 +99,8 @@ class Payment(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        if not self.transaction_ref:
-            self.transaction_ref = str(uuid.uuid4()).replace("-", "").upper()
+        if not self.transaction_id:
+            self.transaction_id = str(uuid.uuid4()).replace("-", "").upper()
         super().save(*args, **kwargs)
 
     def amount_value(self):
@@ -121,7 +124,7 @@ class Booking(models.Model):
     guests = models.PositiveIntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='confirmed')
     cancellation_terms = models.TextField(blank=True)
-    reservation_number = models.CharField(max_length=100, unique=True)
+    reservation_number = models.CharField(max_length=100,blank=True, unique=True)
     notes = models.TextField(blank=True)
     payment_option = models.CharField(max_length=20, choices=Payment.PAYMENT_OPTIONS)
     payment = models.OneToOneField(Payment, null=True, blank=True, on_delete=models.CASCADE, related_name="booking_payment")
@@ -132,10 +135,19 @@ class Booking(models.Model):
     
 
     def calculate_total_cost(self):
-        # Implement your logic to calculate the total cost here
-        # Example calculation based on room price and number of guests
+        # Calculate the number of days between check-in and check-out dates
+        num_days = (self.check_out_date - self.check_in_date).days
+
+        # Calculate the total cost based on the room price and number of days
         room_price = self.room.price
-        num_guests = self.guests
-        total_cost = room_price * Decimal(num_guests)
+        total_cost = room_price * Decimal(num_days)
 
         return total_cost
+
+    def is_room_available(self):
+        return self.room.is_available
+
+    def is_same_type_available(self):
+        booked_rooms = Booking.objects.filter(room__room_type=self.room.room_type).count()
+        available_rooms = self.room.room_type.total_rooms - booked_rooms
+        return available_rooms > 0
