@@ -4,8 +4,9 @@ from .models import Room, Booking, Payment
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .forms import BookingForm
-from .models import Room, Booking, Payment
+from .models import Room, Booking, Payment,RoomType,RoomImage
 from django.conf import settings
+from django.contrib import messages
 #import paystack
 from django.urls import reverse
 from paystackapi.transaction import Transaction as PaystackTransaction
@@ -16,9 +17,19 @@ import uuid
 
 
 def index(request):
-    rooms = Room.objects.all()
+    room_types = RoomType.objects.all()
+    first_room_type = room_types.first()
+    first_room_images = None
+
+    if first_room_type:
+        first_room_images = RoomImage.objects.filter(room__room_type=first_room_type)[:3]
+
+    form = BookingForm()
+
     context = {
-                'rooms':rooms,
+                'room_types':room_types,
+                'form':form,
+                'first_room_images': first_room_images,
                }
     return render(request, 'pages/index.html',context)
 
@@ -36,59 +47,83 @@ def rooms(request):
     context = {
                 'rooms':rooms,
                }
-    return render(request, 'pages/accomodation.html',context)
+    return render(request, 'pages/all-accomodations.html',context)
 
 
 
-@login_required
-def room_book(request, room_id):
-    room = get_object_or_404(Room, id=room_id)
+def room_available_list_view(request, room_type_id):
+    room_type = get_object_or_404(RoomType, id=room_type_id)
+    available_rooms = Room.objects.filter(room_type=room_type, is_available=True)
 
-    if not room.is_available:
-        return render(request, 'room_not_available.html', {'room': room})
+    room_images = {}
+    for room in available_rooms:
+        room_images[room.id] = RoomImage.objects.filter(room=room)[:3]
+    return render(request, 'pages/accomodation.html', {'room_type': room_type, 'available_rooms': available_rooms,'room_images':room_images})
 
-    if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            check_in_date = form.cleaned_data['check_in_date']
-            check_out_date = form.cleaned_data['check_out_date']
-            guests = form.cleaned_data['guests']
-            payment_option = form.cleaned_data['payment_option']
 
-            if payment_option == 'card':
-                booking = Booking.objects.create(
-                    room=room,
-                    customer=request.user.customer,
-                    check_in_date=check_in_date,
-                    check_out_date=check_out_date,
-                    guests=guests,
-                    payment_option=payment_option
-                )
-                return initiate_payment(request, booking)
 
-            elif payment_option == 'cash':
-                room_type = room.room_type
+def room_book(request, room_id=None):
+   
+    room = None
+    room_type = None
+  
+    if room_id:
+        # Logic for booking with specific room selection
+        room = get_object_or_404(Room, id=room_id)
 
-                # Check if any other rooms of the same type are available
-                if room_type.available_rooms > 0:
-                    booking = Booking.objects.create(
-                        room=room,
-                        customer=request.user.customer,
-                        check_in_date=check_in_date,
-                        check_out_date=check_out_date,
-                        guests=guests,
-                        payment_option=payment_option
-                    )
+        if not room.is_available:
+            return render(request, 'room_not_available.html', {'room': room})
+
+        if request.method == 'POST':
+            form = BookingForm(request.POST)
+            if form.is_valid():
+                booking = form.save(commit=False)
+                booking.room = room
+                booking.customer = request.user.customer
+                booking.save()
+
+                # Check payment option
+                payment_option = form.cleaned_data['payment_option']
+                if payment_option == 'card':
+                    return initiate_payment(request, booking)
+                elif payment_option == 'cash':
                     booking.is_paid = True
                     booking.save()
                     return redirect('booking_success', booking_id=booking.id)
-                else:
-                    return render(request, 'room_not_available.html', {'room': room})
+
+        else:
+            form = BookingForm()
 
     else:
-        form = BookingForm()
+        # Logic for booking with room type selection
+        if request.method == 'POST':
+            form = BookingForm(request.POST)
+            if form.is_valid():
+                room_type = form.cleaned_data['room_type']
+                room = room_type.room_set.filter(is_available=True).first()
 
-    return render(request, 'book_room.html', {'room': room, 'form': form})
+                if room is not None:
+                    booking = form.save(commit=False)
+                    booking.room = room
+                    booking.customer = request.user.customer
+                    booking.save()
+
+                    # Check payment option
+                    payment_option = form.cleaned_data['payment_option']
+                    if payment_option == 'card':
+                        return initiate_payment(request, booking)
+                    elif payment_option == 'cash':
+                        booking.is_paid = True
+                        booking.save()
+                        return redirect('booking_success', booking_id=booking.id)
+                else:
+                    messages.error(request, 'No available rooms for selected room type.')
+                    return redirect('room_list')  # Redirect to a page with available room types or other suitable URL
+
+        else:
+            form = BookingForm()
+
+    return redirect('hotel:index')
 
 
 def initiate_payment(request, booking):
@@ -170,3 +205,16 @@ def privacy_policy(request):
 
 def terms(request):
     return render(request, 'pages/index.html')
+
+
+# views.py
+from django.http import JsonResponse
+
+def get_available_rooms(request):
+    if request.method == 'GET' and request.is_ajax():
+        room_type_id = request.GET.get('room_type_id')
+        rooms = Room.objects.filter(room_type_id=room_type_id, is_available=True)
+        room_data = [{'id': room.id, 'room_number': room.room_number} for room in rooms]
+        return JsonResponse({'rooms': room_data})
+    else:
+        return JsonResponse({'error': 'Invalid request'})

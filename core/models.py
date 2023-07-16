@@ -64,7 +64,7 @@ class RoomType(models.Model):
 
 class Room(models.Model):
     room_number = models.CharField(max_length=10, unique=True)
-    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE)
+    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE, )
     floor = models.PositiveIntegerField()
     capacity = models.PositiveIntegerField()
     is_available = models.BooleanField(default=True)
@@ -116,7 +116,8 @@ class Booking(models.Model):
         ('completed', 'Completed'),
     ]
 
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True, blank=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     check_in_date = models.DateField()
     check_out_date = models.DateField()
@@ -133,6 +134,10 @@ class Booking(models.Model):
     def __str__(self):
         return f"{self.room} - {self.customer}"
     
+    def save(self, *args, **kwargs):
+        if not self.reservation_number:
+            self.reservation_number = str(uuid.uuid4()).replace("-", "").upper()
+        super().save(*args, **kwargs)
 
     def calculate_total_cost(self):
         # Calculate the number of days between check-in and check-out dates
@@ -145,9 +150,9 @@ class Booking(models.Model):
         return total_cost
 
     def is_room_available(self):
-        return self.room.is_available
+        return self.room and self.room.is_available
 
     def is_same_type_available(self):
-        booked_rooms = Booking.objects.filter(room__room_type=self.room.room_type).count()
-        available_rooms = self.room.room_type.total_rooms - booked_rooms
+        booked_rooms = Booking.objects.filter(room_type=self.room_type, status='confirmed').count()
+        available_rooms = self.room_type.total_rooms - booked_rooms
         return available_rooms > 0
