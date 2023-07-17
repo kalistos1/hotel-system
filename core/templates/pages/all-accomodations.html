@@ -1,6 +1,7 @@
 {% extends 'hotel-base.html' %}
 {% load static %}
 {% block content %}
+{% load myfilters %}
         
             <!--================Breadcrumb Area =================-->
             <section class="breadcrumb_area">
@@ -102,86 +103,28 @@
             <div class="container">
                 
                 <div class="row accomodation_two">
+                    {% for room in available_rooms %}
                     <div class="col-lg-3 col-sm-6">
                         <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room1.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Double Deluxe Room</h4></a>
-                            <h5>$250<small>/night</small></h5>
+                            {% with room_images|get_dict_value:room.id as images %}
+                            {% if images %}
+                       <div class="hotel_img">
+                           {% for image in images %}
+                           
+                           <img src="{{ image.image1.url }}"  class="img-fluid" alt="">
+                           <a href="{% url 'hotel:start_booking' room_id=room.id %}" class="btn theme_btn button_hover">Book Now</a>
+                           
+                           
+                           {% endfor %}
+                       </div>
+                       {% endif %}
+                       {% endwith %}
+                            <a href="#"><h4 class="sec_h4">{{ room.room_number }} ({{ room.room_type.name }})</h4></a>
+                            <h5>#{{ room.price }}<small>per/night</small></h5>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room2.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Single Deluxe Room</h4></a>
-                            <h5>$200<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room3.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Honeymoon Suit</h4></a>
-                            <h5>$750<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room4.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Economy Double</h4></a>
-                            <h5>$200<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room1.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Double Deluxe Room</h4></a>
-                            <h5>$250<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room2.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Single Deluxe Room</h4></a>
-                            <h5>$200<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room3.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Honeymoon Suit</h4></a>
-                            <h5>$750<small>/night</small></h5>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="accomodation_item text-center">
-                            <div class="hotel_img">
-                                <img src="{% static 'core/image/room4.jpg' %}" alt="">
-                                <a href="#" class="btn theme_btn button_hover">Book Now</a>
-                            </div>
-                            <a href="#"><h4 class="sec_h4">Economy Double</h4></a>
-                            <h5>$200<small>/night</small></h5>
-                        </div>
-                    </div>
+                    {% endfor %}
+                    
                 </div>
             </div>
         </section>

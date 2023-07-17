@@ -133,4 +133,4 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-PAYSTACK_SECRET_KEY = 'your_secret_key'
+PAYSTACK_PUBLIC_KEY = ''

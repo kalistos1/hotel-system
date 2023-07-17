@@ -43,12 +43,15 @@ def contact_us(request):
 
 
 def rooms(request):
-    rooms = Room.objects.all()
-    context = {
-                'rooms':rooms,
-               }
-    return render(request, 'pages/all-accomodations.html',context)
+    available_rooms = Room.objects.filter(is_available=True)
 
+    # Fetch the room images for each available room
+    room_images = {}
+    for room in available_rooms:
+        room_images[room.id] = RoomImage.objects.filter(room=room)[:3]
+    return render(request, 'pages/all-accomodations.html',{'available_rooms': available_rooms, 'room_images': room_images})
+
+    
 
 
 def room_available_list_view(request, room_type_id):
@@ -61,12 +64,21 @@ def room_available_list_view(request, room_type_id):
     return render(request, 'pages/accomodation.html', {'room_type': room_type, 'available_rooms': available_rooms,'room_images':room_images})
 
 
+def start_booking(request, room_id):
+    form = BookingForm()
+    room = get_object_or_404(Room, id=room_id)
+    context ={
+        'form':form,
+        'room':room,
+    }
+    return render(request,'pages/book-room.html',context)
+
 
 def room_book(request, room_id=None):
    
     room = None
     room_type = None
-  
+    print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee',room_id)
     if room_id:
         # Logic for booking with specific room selection
         room = get_object_or_404(Room, id=room_id)
@@ -92,6 +104,7 @@ def room_book(request, room_id=None):
                     return redirect('booking_success', booking_id=booking.id)
 
         else:
+            print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
             form = BookingForm()
 
     else:
@@ -140,10 +153,9 @@ def initiate_payment(request, booking):
         transaction_ref=transaction_ref,
         email=booking.customer.user.email
     )
-
-    # Redirect to the Paystack payment page
-    return redirect(f'/paystack_payment/{payment.id}/')
-
+       # Replace 'api.paystack.co' with the actual Paystack API URL
+    paystack_payment_url = f'https://{settings.PAYSTACK_PUBLIC_KEY}@api.paystack.co/transaction/initialize/{payment.id}/'
+    return redirect(paystack_payment_url)
 
 @login_required
 def process_payment(request, payment_id):
@@ -165,7 +177,7 @@ def process_payment(request, payment_id):
             payment.verified = True
             payment.save()
 
-            return redirect('booking_success', booking_id=booking.id)
+            return redirect('hotel:booking_success', booking_id=booking.id)
         else:
             # Handle payment failure
             return redirect('payment_failed', booking_id=booking.id)

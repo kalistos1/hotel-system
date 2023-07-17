@@ -36,7 +36,7 @@
                                     {% for image in images %}
                                     
                                     <img src="{{ image.image1.url }}"  class="img-fluid" alt="">
-                                    <a href="{% url 'hotel:room_book' room_id=room.id %}" class="btn theme_btn button_hover">Book Now</a>
+                                    <a href="{% url 'hotel:room_book_by_room_id' room_id=room.id %}" class="btn theme_btn button_hover">Book Now</a>
                                     
                                     <div class="row mt-3">
                                         <div class="col-md-6">

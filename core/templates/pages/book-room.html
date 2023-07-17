@@ -1,0 +1,107 @@
+{% extends 'hotel-base.html' %}
+{% load static %}
+{% block content %}
+        <!--================Breadcrumb Area =================-->
+<section class="breadcrumb_area">
+    <div class="overlay bg-parallax" data-stellar-ratio="0.8" data-stellar-vertical-offset="0" data-background=""></div>
+    <div class="container">
+        <div class="page-cover text-center">
+            <h2 class="page-cover-tittle">Book Room</h2>
+            <ol class="breadcrumb">
+                <li><a href="index.html">Home</a></li>
+                <li class="active">About</li>
+            </ol>
+        </div>
+    </div>
+</section>
+<!--================Breadcrumb Area =================-->
+
+        <!--================ About History Area  =================-->
+        <section class="about_history_area section_gap">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6  align-items-center">
+                        <div class="about_content ">
+                            <h2 class="title title_color">Room No. ({{ room.room_number }})<br>Room Type: ({{ room.room_type.name }}) <br> Room Price: (#{{ room.price }})</h2>
+                            <p>inappropriate behavior is often laughed off as “boys will be boys,” women face higher conduct standards especially in the workplace. That’s why it’s crucial that, as women, our behavior on the job is beyond reproach. inappropriate behavior is often laughed.</p>
+                           
+                        </div>
+
+                        <div class="row d-block mb-4">
+                            <div class="col-md-12">
+                                <!-- Your template.html -->
+<form method="post" action="{% url 'hotel:room_book_by_room_id' room_id=room.id %}">
+    {% csrf_token %}
+
+    <!-- Display non-field errors -->
+    {% if form.non_field_errors %}
+        <div class="text-danger">
+            {% for error in form.non_field_errors %}
+                <p class="alert alert-danger text-danger" role="alert">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Render the form fields with their respective errors -->
+    <div class="form-group">
+        <label  class="px-3"for="{{ form.room_type.id_for_label }}"><b>Room Type</b></label>
+        {{ form.room_type }}
+        {{ form.room_type.errors }}
+    </div>
+
+    <div class="form-group">
+        
+        {{ form.check_in_date }}
+        {{ form.check_in_date.errors }}
+    </div>
+
+    <div class="form-group">
+        
+        {{ form.check_out_date }}
+        {{ form.check_out_date.errors }}
+    </div>
+
+    <div class="form-group">
+       
+        {{ form.guests }}
+        {{ form.guests.errors }}
+    </div>
+
+    <div class="form-group px-5">
+        <label>Payment Option:</label>
+        {% for radio in form.payment_option %}
+            <div class="form-check">
+                {{ radio }}
+               
+            </div>
+        {% endfor %}
+        {{ form.payment_option.errors }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                    {% for image in room.roomimage_set.all %}
+                    <div class="col-md-6">
+                        <img class="img-fluid" src="{{ image.image1.url }}" alt="img">
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <img class="img-fluid" src="{{ image.image2.url }}" alt="img">
+                            </div>
+                            <div class="col-md-6">
+                                <img class="img-fluid" src="{{ image.image3.url }}" alt="img">
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        <!--================ About History Area  =================-->
+        
+
+      {% endblock %}
