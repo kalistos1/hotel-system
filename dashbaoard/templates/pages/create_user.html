@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+    
+      <!-- partial -->
+      <!-- partial:../../partials/_sidebar.html -->
+      {% include 'partials/sidebar.html' %}
+      <!-- partial -->
+      <div class="main-panel">        
+        <div class="content-wrapper">
+          <div class="row">
+           
+            
+            <div class="col-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="card-title">Create New User</h4>
+                  {% if messages %}
+                  <div class="alert alert-success" role="alert">
+                    <h4 class="alert-heading">Well done!</h4>
+                    {% for message in messages %}
+                    <p {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}.</p>
+                    {% endfor %}
+                    <hr>
+                    <p class="mb-0">you can create New user or go back to <b><a href="{% url 'dashboard' %}">Dashboard</a></b>.</p>
+                  </div>
+                  {% endif %}
+                  
+                  <form class="forms-sample"  method="post" enctype="multipart/form-data"> {% csrf_token %}
+                    <div class="form-group">
+                      <label  class="px-3"for="{{ form.username.label }}"><b>{{ form.username.label }}</b></label>
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+
+                    <div class="form-group">
+                      <label for="{{ form.email.label}}"><b>{{ form.email.label }}</b></label>
+                      {{ form.email}}
+                    </div>
+                    <div class="form-group">
+                      <label for="{{form.phone_number.label}}"><b>{{ form.phone_number.label}}</b></label>
+                      {{ form.phone_number}}
+                      
+                    </div>
+
+                    <div class="form-group">
+                      <label for="{{form.password1.label}}"><b>{{ form.password1.label}}</b></label>
+                      {{ form.password1}}
+                      
+                    </div>
+
+                    
+
+                    <div class="form-group">
+                      <label for="{{form.password2.label}}"><b>{{ form.password2.label}}</b></label>
+                      {{ form.password2}}
+                      
+                    </div>
+
+                    <div class="form-group">
+                      <label for="{{form.services.label}}">{{ form.services.label}}</label>
+                      {{ form.services}}
+                      
+                    </div>
+
+                    <div class="form-group">
+                      <div class="row">
+                        
+                          <div class="col-md-3 col-sm-6 col-6">
+                            <label for="{{form.is_manager.label}}">{{ form.is_manager.label}}{{ form.is_manager}}</label>
+                          </div>
+
+                          <div class="col-md-3 col-sm-6 col-6">
+                            <label for="{{form.is_receptionist.label}}">{{ form.is_receptionist.label}}{{ form.is_receptionist}}</label>
+                          </div>
+
+                        
+                        </div>
+                      
+                    </div>
+
+                   <div class="form-group">
+                    <button type="submit d-block" class="btn btn-primary  form-control mr-2">Submit</button>
+                    <div>
+                    
+                  </form>
+                </div>
+              </div>
+            </div>
+            
+            
+           
+            
+          </div>
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:../../partials/_footer.html -->
+        {% endblock content %}

@@ -1,7 +1,7 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'dashboard' %}">
+        <a class="nav-link" href="{% url 'dashboard:dashboard' %}">
           <i class="typcn typcn-device-desktop menu-icon"></i>
           <span class="menu-title">Dashboard</span>
           <!-- <div class="badge badge-danger">new</div> -->
@@ -10,13 +10,13 @@
       <li class="nav-item">
         <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
           <i class="typcn typcn-document-text menu-icon"></i>
-          <span class="menu-title">Accomodation</span>
+          <span class="menu-title">manage Users</span>
           <i class="menu-arrow"></i>
         </a>
         <div class="collapse" id="ui-basic">
           <ul class="nav flex-column sub-menu">
-            <li class="nav-item"> <a class="nav-link" href="{% url 'accommodation_create' %}">Create</a></li>
-            <li class="nav-item"> <a class="nav-link" href="{% url 'accommodation_details' %}">Details</a></li>
+            <li class="nav-item"> <a class="nav-link" href="{% url 'dashboard:user_create' %}">Create</a></li>
+            <li class="nav-item"> <a class="nav-link" href="{% url 'dashboard:all_users' %}">all users</a></li>
           </ul>
         </div>
       </li>
