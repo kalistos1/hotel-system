@@ -3,7 +3,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from  core .models import User, Amenity,RoomType
+from  core .models import User, Amenity,RoomType, Room, Customer
 from .forms import RoomTypeForm
 from .forms import AmenityForm
 from django.contrib import messages 
@@ -11,7 +11,20 @@ from django.contrib import messages
 # Create your views here.
 
 def dashboard(request):
-    return render(request, "pages/dashboard.html")
+    users = User.objects.count()
+    amenities = Amenity.objects.count()
+    rooms = Room.objects.count()
+    customers = Customer.objects.count()
+    print("kkkkkk", users)
+
+    context = {
+        "users":users,
+        "amenities":amenities,
+        "rooms":rooms,
+        "customers":customers
+
+    }
+    return render(request, "pages/dashboard.html", context)
 
 
 #@user_passes_test(lambda u: u.is_manager)
