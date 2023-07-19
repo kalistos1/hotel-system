@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- partial -->
+<!-- partial:../../partials/_sidebar.html -->
+{% include 'partials/sidebar.html' %}
+<!-- partial -->
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+
+
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Update Amenity</h4>
+                        
+                        <!-- {% if messages %}
+                        <div class="alert alert-success" role="alert">
+                            <h4 class="alert-heading">Well done!</h4>
+                            {% for message in messages %}
+                            <p {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}.</p>
+                            {% endfor %}
+                            <hr>
+                            <p class="mb-0">you can create New user or go back to <b><a
+                                        href="{% url 'dashboard' %}">Dashboard</a></b>.</p>
+                        </div>
+                        {% endif %} -->
+
+                        <form class="forms-sample" method="post" enctype="multipart/form-data"> {% csrf_token %}
+                            <div class="form-group">
+                                <label class="px-3" for="{{ form.name.label }}"><b>{{ form.name.label }}</b></label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <div class="error-message">
+                                    
+                                    <ul>
+                                        {% for field, error_list in form.errors.items %}
+                                        {% for error in error_list %}
+                                        <li style="color: red;">{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.description.label}}"><b>{{ form.description.label }}</b></label>
+                                {{ form.description}}
+                                {% if form.description.errors %}
+                                <div class="error-message">
+                                    
+                                    <ul>
+                                        {% for field, error_list in form.errors.items %}
+                                        {% for error in error_list %}
+                                        <li style="color: red;">{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                <label for="{{ form.description.label}}"><b>{{ form.description.label }}</b></label>
+                                {{ form.image}}
+                                {% if form.image.errors %}
+                                <div class="error-message">
+                                    
+                                    <ul>
+                                        {% for field, error_list in form.errors.items %}
+                                        {% for error in error_list %}
+                                        <li style="color: red;">{{ field }}: {{ error }}</li>
+                                        {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+
+
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit d-block" class="btn btn-primary  form-control mr-2">Submit</button>
+                                <div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- content-wrapper ends -->
+    <!-- partial:../../partials/_footer.html -->
+    {% endblock content %}

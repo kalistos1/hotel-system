@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- partial -->
+<!-- partial:partials/_sidebar.html -->
+{% include 'partials/sidebar.html' %}
+<!-- partial -->
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="table-responsive pt-3">
+            <table class="table table-striped project-orders-table">
+              <thead>
+                <tr>
+                  <th class="ml-5">ID</th>
+                  <th> Name</th>
+                  <th>Image</th>
+                  <th>Description</th>
+                 
+                  <th>&nbsp;&nbsp;&nbsp;&nbsp; Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for amenity in amenities %}
+                <tr>
+                  <td>{{ forloop.counter}}</td>
+                  <td>{{ amenity.name}} {{user.last_name}} </td>
+                  <td><img src="{{ amenity.image.url}}" alt=""></td>
+                  <td>{{ amenity.description}}</td>
+
+                  {{ amenity.amenity_id }}
+                  
+                  
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <a href="{% url 'dashboard:amenity_update' amenity.id %}">
+                        <button type="button" class="btn btn-success btn-sm btn-icon-text mr-3">
+                          Edit
+                          <i class="typcn typcn-edit btn-icon-append"></i>
+                        </button>
+                      </a>
+                     <a href="{% url 'dashboard:amenity_delete' amenity.id %}">
+                      <button type="button" class="btn btn-danger btn-sm btn-icon-text">
+                        Delete
+                        <i class="typcn typcn-delete-outline btn-icon-append"></i>
+                      </button>
+                     </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+
+              
+
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- content-wrapper ends -->
+  <!-- partial:partials/_footer.html -->
+
+  {% endblock content %}
