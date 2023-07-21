@@ -2,7 +2,7 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm,CustomrRegistrationCreationForm
 from  core .models import User, Amenity,RoomType, Room, Customer
 from .forms import RoomTypeForm
 from .forms import AmenityForm
@@ -30,13 +30,13 @@ def dashboard(request):
 #@user_passes_test(lambda u: u.is_manager)
 def user_create_view(request):
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
+        form = CustomrRegistrationCreationForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('user_list')
     else:
-        form = CustomUserCreationForm()
-    return render(request, 'pages/create_user.html', {'form': form})
+        form = CustomrRegistrationCreationForm()
+    return render(request, "pages/customer_register.html", {'form': form})
 
 
 
@@ -159,3 +159,10 @@ def room_type_update_view(request, room_type_id):
     else:
         form = RoomTypeForm(instance=room_type)
     return render(request, 'pages/room_type_upate.html', {"form":form})
+
+
+
+# -------------------------------------------------------------------------------------------------------
+
+# def customer_register(request):
+#     return render(request, "pages/customer_register.html" )
